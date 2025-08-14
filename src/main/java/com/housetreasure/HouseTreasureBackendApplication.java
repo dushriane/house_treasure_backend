@@ -1,4 +1,4 @@
-package main.java.com.housetreasure;
+package com.housetreasure;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
