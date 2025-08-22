@@ -24,9 +24,8 @@ public class Offer {
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
-    @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    private String itemId;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal offeredAmount;

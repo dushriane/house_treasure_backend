@@ -19,7 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findBySellerIdOrderByCreatedAtDesc(Long sellerId);
     
     // Find transactions by item
-    List<Transaction> findByItemIdOrderByCreatedAtDesc(Long itemId);
+    List<Transaction> findByItemIdOrderByCreatedAtDesc(String itemId);
     
     // Find transactions by status
     List<Transaction> findByStatus(TransactionStatus status);

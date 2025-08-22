@@ -46,7 +46,7 @@ public class TransactionController {
         try {
             Long buyerId = Long.valueOf(request.get("buyerId").toString());
             Long sellerId = Long.valueOf(request.get("sellerId").toString());
-            Long itemId = Long.valueOf(request.get("itemId").toString());
+            String itemId = (String) request.get("itemId");
             BigDecimal amount = new BigDecimal(request.get("amount").toString());
             PaymentMethod paymentMethod = PaymentMethod.valueOf(request.get("paymentMethod").toString());
             String buyerPhone = (String) request.get("buyerPhone");
@@ -219,7 +219,7 @@ public class TransactionController {
     }
 
     @GetMapping("/item/{itemId}")
-    public List<Transaction> getTransactionsByItem(@PathVariable Long itemId) {
+    public List<Transaction> getTransactionsByItem(@PathVariable String itemId) {
         return transactionService.getTransactionsByItem(itemId);
     }
 

@@ -24,9 +24,8 @@ public class Transaction {
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    @Column(name = "item_id", nullable = false)
+    private String itemId;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;

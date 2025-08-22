@@ -53,7 +53,7 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    public Transaction createTransaction(Long buyerId, Long sellerId, Long itemId, 
+    public Transaction createTransaction(Long buyerId, Long sellerId, String itemId, 
                                       BigDecimal amount, PaymentMethod paymentMethod,
                                       String buyerPhone, String sellerPhone) {
         Transaction transaction = new Transaction();
@@ -297,7 +297,7 @@ public class TransactionService {
         return transactionRepository.findByStatus(status);
     }
 
-    public List<Transaction> getTransactionsByItem(Long itemId) {
+    public List<Transaction> getTransactionsByItem(String itemId) {
         return transactionRepository.findByItemIdOrderByCreatedAtDesc(itemId);
     }
 
