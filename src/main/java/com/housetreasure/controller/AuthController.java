@@ -1,5 +1,8 @@
 package com.housetreasure.controller;
 
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -36,18 +39,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail());
-        if (user == null) {
-            return ResponseEntity.status(401).body("Invalid email or password");
-        }
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid email or password");
-        }
-        // For now, just return user info (never return password)
-        user.setPassword(null);
-        return ResponseEntity.ok(user);
-    }
+    public ResponseEntity<User> loginUser(@RequestBody Map<String, String> credentials) {
+    String email = credentials.get("email");
+    String password = credentials.get("password");
+    
+    Optional<User> userOptional = userService.loginUser(email, password);
+    
+    return userOptional.map(ResponseEntity::ok)
+                      .orElse(ResponseEntity.status(401).build());
+}
 
     public static class LoginRequest {
         private String email;

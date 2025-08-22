@@ -17,12 +17,10 @@ import com.housetreasure.repository.OfferRepository;
 public class OfferService {
     private final OfferRepository offerRepository;
     private final UserService userService;
-    private final ItemService itemService;
 
-    public OfferService(OfferRepository offerRepository, UserService userService, ItemService itemService) {
+    public OfferService(OfferRepository offerRepository, UserService userService) {
         this.offerRepository = offerRepository;
         this.userService = userService;
-        this.itemService = itemService;
     }
 
     // === BASIC OPERATIONS ===

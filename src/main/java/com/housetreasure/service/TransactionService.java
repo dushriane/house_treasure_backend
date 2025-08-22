@@ -19,13 +19,11 @@ import com.housetreasure.repository.TransactionRepository;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserService userService;
-    private final ItemService itemService;
 
     public TransactionService(TransactionRepository transactionRepository, 
-                            UserService userService, ItemService itemService) {
+                            UserService userService) {
         this.transactionRepository = transactionRepository;
         this.userService = userService;
-        this.itemService = itemService;
     }
 
     // === BASIC OPERATIONS ===
@@ -83,13 +81,21 @@ public class TransactionService {
     public Transaction updateTransactionStatus(Long transactionId, TransactionStatus newStatus) {
         return transactionRepository.findById(transactionId)
             .map(transaction -> {
-                TransactionStatus oldStatus = transaction.getStatus();
                 transaction.setStatus(newStatus);
                 
                 // Update timestamps based on status
                 switch (newStatus) {
+                    case PENDING:
+                        // No specific action needed for pending
+                        break;
+                    case PAYMENT_SENT:
+                        // No specific timestamp for payment sent
+                        break;
                     case PAYMENT_CONFIRMED:
                         transaction.setPaymentConfirmedAt(LocalDateTime.now());
+                        break;
+                    case PICKUP_ARRANGED:
+                        // No specific timestamp for pickup arranged
                         break;
                     case PICKUP_COMPLETED:
                         transaction.setPickupCompletedAt(LocalDateTime.now());
@@ -99,6 +105,9 @@ public class TransactionService {
                         break;
                     case CANCELLED:
                         transaction.setCancelledAt(LocalDateTime.now());
+                        break;
+                    case DISPUTED:
+                        // No specific timestamp for disputed
                         break;
                 }
                 
