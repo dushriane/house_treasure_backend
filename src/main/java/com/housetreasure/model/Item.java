@@ -1,57 +1,31 @@
 package com.housetreasure.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "items")
-@Getter
-@Setter
+@Document(collection = "items")
 public class Item {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
-    private User seller;
-
-    @Column(nullable = false)
+    private String id;
+    private String sellerId;
     private String title;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
-
-    // Item condition and details
-    @Enumerated(EnumType.STRING)
-    private ItemCondition condition;
-
+    private String categoryId;
+    private Double price;
+    private String condition;
     private String brand;
     private String model;
     private Integer yearOfPurchase;
     private String originalReceipt; // URL to receipt image
 
     // Item Images table in db 
-    @ElementCollection
-    @CollectionTable(name = "item_images", joinColumns = @JoinColumn(name = "item_id"))
-    @Column(name = "image_url")
     private List<String> imageUrls;
 
     // Item status
-    @Enumerated(EnumType.STRING)
-    private ItemStatus status = ItemStatus.AVAILABLE;
+    private String status;
 
     // Negotiation settings
     private Boolean isNegotiable = true;
@@ -62,23 +36,117 @@ public class Item {
     private LocalDateTime soldAt;
 
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    // Getters and Setters
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getSellerId() {
+        return sellerId;
+    }
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String getCategoryId() {
+        return categoryId;
+    }
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+    public Double getPrice() {
+        return price;
+    }
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+    public String getCondition() {
+        return condition;
+    }
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+    public String getBrand() {
+        return brand;
+    }
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+    public String getModel() {
+        return model;
+    }
+    public void setModel(String model) {
+        this.model = model;
+    }
+    public Integer getYearOfPurchase() {
+        return yearOfPurchase;
+    }
+    public void setYearOfPurchase(Integer yearOfPurchase) {
+        this.yearOfPurchase = yearOfPurchase;
+    }
+    public String getOriginalReceipt() {
+        return originalReceipt;
+    }
+    public void setOriginalReceipt(String originalReceipt) {
+        this.originalReceipt = originalReceipt;
+    }
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    public Boolean getIsNegotiable() {
+        return isNegotiable;
+    }
+    public void setIsNegotiable(Boolean isNegotiable) {
+        this.isNegotiable = isNegotiable;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    public LocalDateTime getSoldAt() {
+        return soldAt;
+    }
+    public void setSoldAt(LocalDateTime soldAt) {
+        this.soldAt = soldAt;
     }
 
-    public enum ItemCondition {
-        NEW,
-        LIKE_NEW,
-        GOOD,
-        FAIR,
-        POOR
-    }
+    
 
-    public enum ItemStatus {
-        AVAILABLE,
-        RESERVED,
-        SOLD,
-        DELETED
-    }
+    // public enum ItemCondition {
+    //     NEW, LIKE_NEW, GOOD, FAIR, POOR
+    // }
+
+    // public enum ItemStatus {
+    //     AVAILABLE, RESERVED, SOLD, DELETED
+    // }
 }

@@ -1,5 +1,6 @@
 package com.housetreasure.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class ItemService {
     }
 
     public Item saveItem(Item item){
+        item.setUpdatedAt(LocalDateTime.now());
         return itemRepository.save(item);
     }
+
+    
 }

@@ -2,50 +2,30 @@ package com.housetreasure.model;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "messages")
-@Getter
-@Setter
+@Document(collection = "messages")
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "sender_id", nullable = false)
-    private User sender;
-
-    @ManyToOne
-    @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiver;
+    private String id;
+    private String sender;
+    private String receiver;
 
     // Optional: Link to a specific item if the message is about an item
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+    private String item;
 
     // Optional: Link to a transaction if the message is about a transaction
-    @ManyToOne
-    @JoinColumn(name = "transaction_id")
-    private Transaction transaction;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
+    private String transaction;
     private String content;
-
-    @Enumerated(EnumType.STRING)
-    private MessageType messageType = MessageType.TEXT;
+    private String messageType;
 
     // For media messages (images, voice notes, etc.)
     private String mediaUrl;
     private String mediaType; // "image", "voice", "document"
 
     // Message status
-    @Enumerated(EnumType.STRING)
-    private MessageStatus status = MessageStatus.SENT;
+    private String status;
 
     private Boolean isRead = false;
     private LocalDateTime readAt;
@@ -53,24 +33,139 @@ public class Message {
     // Timestamps
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt;
+    private LocalDateTime sentAt;
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    public Message() {
+        this.sentAt = LocalDateTime.now();
+        this.status = "SENT";
     }
 
-    public enum MessageType {
-        TEXT,
-        IMAGE,
-        VOICE,
-        DOCUMENT,
-        SYSTEM // For system notifications
+    public String getId() {
+        return id;
     }
 
-    public enum MessageStatus {
-        SENT,
-        DELIVERED,
-        READ,
-        FAILED
+    public void setId(String id) {
+        this.id = id;
     }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+
+    public String getItem() {
+        return item;
+    }
+
+    public void setItem(String item) {
+        this.item = item;
+    }
+
+    public String getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(String transaction) {
+        this.transaction = transaction;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Boolean getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(Boolean isRead) {
+        this.isRead = isRead;
+    }
+
+    public LocalDateTime getReadAt() {
+        return readAt;
+    }
+
+    public void setReadAt(LocalDateTime readAt) {
+        this.readAt = readAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getSentAt() {
+        return sentAt;
+    }
+
+    public void setSentAt(LocalDateTime sentAt) {
+        this.sentAt = sentAt;
+    }
+
+    
+    // public enum MessageType {
+    //     TEXT, IMAGE, VOICE, DOCUMENT, SYSTEM // For system notifications
+    // }
+
+    // public enum MessageStatus {
+    //     SENT, DELIVERED, READ, FAILED
+    // }
 }
