@@ -37,7 +37,7 @@ public class OfferService {
     }
 
     // === MAKING OFFERS ===
-    public Offer makeOffer(Long buyerId, Long sellerId, Long itemId, BigDecimal amount, 
+    public Offer makeOffer(Long buyerId, Long sellerId, String itemId, BigDecimal amount, 
                           String message, Integer validityHours) {
         
         // Check if buyer already has a pending offer for this item
@@ -166,7 +166,7 @@ public class OfferService {
 
     // === RETRIEVING OFFERS ===
     
-    public List<Offer> getOffersForItem(Long itemId) {
+    public List<Offer> getOffersForItem(String itemId) {
         return offerRepository.findByItemIdOrderByCreatedAtDesc(itemId);
     }
 
@@ -190,21 +190,21 @@ public class OfferService {
         return offerRepository.findBySellerIdAndStatus(sellerId, status);
     }
 
-    public List<Offer> getOffersByItemAndStatus(Long itemId, OfferStatus status) {
+    public List<Offer> getOffersByItemAndStatus(String itemId, OfferStatus status) {
         return offerRepository.findByItemIdAndStatus(itemId, status);
     }
 
     // === OFFER HISTORY & NEGOTIATIONS ===
-    
-    public List<Offer> getOfferHistory(Long buyerId, Long sellerId, Long itemId) {
+
+    public List<Offer> getOfferHistory(Long buyerId, Long sellerId, String itemId) {
         return offerRepository.findByBuyerIdAndSellerIdAndItemIdOrderByCreatedAtDesc(buyerId, sellerId, itemId);
     }
 
-    public List<Offer> getPendingOffersForItem(Long itemId) {
+    public List<Offer> getPendingOffersForItem(String itemId) {
         return offerRepository.findByItemIdAndStatusOrderByCreatedAtDesc(itemId, OfferStatus.PENDING);
     }
 
-    public Optional<Offer> getHighestOfferForItem(Long itemId) {
+    public Optional<Offer> getHighestOfferForItem(String itemId) {
         return offerRepository.findHighestOfferForItem(itemId, PageRequest.of(0, 1))
                 .getContent()
                 .stream()
@@ -212,8 +212,8 @@ public class OfferService {
     }
 
     // === UTILITY METHODS ===
-    
-    public long getOfferCountForItem(Long itemId) {
+
+    public long getOfferCountForItem(String itemId) {
         return offerRepository.countByItemId(itemId);
     }
 
@@ -243,12 +243,12 @@ public class OfferService {
     }
 
     // === NEGOTIATION HELPERS ===
-    
-    public boolean hasPendingOffer(Long buyerId, Long itemId) {
+
+    public boolean hasPendingOffer(Long buyerId, String itemId) {
         return offerRepository.findByBuyerIdAndItemIdAndStatus(buyerId, itemId, OfferStatus.PENDING).isPresent();
     }
 
-    public boolean canMakeOffer(Long buyerId, Long itemId) {
+    public boolean canMakeOffer(Long buyerId, String itemId) {
         // Check if item is available and buyer doesn't have pending offer
         return !hasPendingOffer(buyerId, itemId);
     }

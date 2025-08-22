@@ -45,7 +45,7 @@ public class OfferController {
         try {
             Long buyerId = Long.valueOf(request.get("buyerId").toString());
             Long sellerId = Long.valueOf(request.get("sellerId").toString());
-            Long itemId = Long.valueOf(request.get("itemId").toString());
+            String itemId = request.get("itemId").toString();
             BigDecimal amount = new BigDecimal(request.get("amount").toString());
             String message = (String) request.get("message");
             Integer validityHours = request.get("validityHours") != null ? 
@@ -120,7 +120,7 @@ public class OfferController {
 
     // === RETRIEVING OFFERS ===
     @GetMapping("/item/{itemId}")
-    public List<Offer> getOffersForItem(@PathVariable Long itemId) {
+    public List<Offer> getOffersForItem(@PathVariable String itemId) {
         return offerService.getOffersForItem(itemId);
     }
 
@@ -150,7 +150,7 @@ public class OfferController {
     }
 
     @GetMapping("/item/{itemId}/status/{status}")
-    public List<Offer> getOffersByItemAndStatus(@PathVariable Long itemId, @PathVariable OfferStatus status) {
+    public List<Offer> getOffersByItemAndStatus(@PathVariable String itemId, @PathVariable OfferStatus status) {
         return offerService.getOffersByItemAndStatus(itemId, status);
     }
 
@@ -158,17 +158,17 @@ public class OfferController {
     @GetMapping("/history")
     public List<Offer> getOfferHistory(@RequestParam Long buyerId, 
                                       @RequestParam Long sellerId, 
-                                      @RequestParam Long itemId) {
+                                      @RequestParam String itemId) {
         return offerService.getOfferHistory(buyerId, sellerId, itemId);
     }
 
     @GetMapping("/item/{itemId}/pending")
-    public List<Offer> getPendingOffersForItem(@PathVariable Long itemId) {
+    public List<Offer> getPendingOffersForItem(@PathVariable String itemId) {
         return offerService.getPendingOffersForItem(itemId);
     }
 
     @GetMapping("/item/{itemId}/highest")
-    public ResponseEntity<Offer> getHighestOfferForItem(@PathVariable Long itemId) {
+    public ResponseEntity<Offer> getHighestOfferForItem(@PathVariable String itemId) {
         return offerService.getHighestOfferForItem(itemId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -176,7 +176,7 @@ public class OfferController {
 
     // === STATISTICS ===
     @GetMapping("/item/{itemId}/count")
-    public Map<String, Long> getOfferCountForItem(@PathVariable Long itemId) {
+    public Map<String, Long> getOfferCountForItem(@PathVariable String itemId) {
         return Map.of("offerCount", offerService.getOfferCountForItem(itemId));
     }
 
@@ -203,7 +203,7 @@ public class OfferController {
     }
 
     @GetMapping("/can-make-offer")
-    public Map<String, Boolean> canMakeOffer(@RequestParam Long buyerId, @RequestParam Long itemId) {
+    public Map<String, Boolean> canMakeOffer(@RequestParam Long buyerId, @RequestParam String itemId) {
         return Map.of("canMakeOffer", offerService.canMakeOffer(buyerId, itemId));
     }
 

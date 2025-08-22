@@ -14,7 +14,7 @@ import com.housetreasure.model.Offer.OfferStatus;
 
 public interface OfferRepository extends JpaRepository<Offer, Long> {
     // Find offers by item
-    List<Offer> findByItemIdOrderByCreatedAtDesc(Long itemId);
+    List<Offer> findByItemIdOrderByCreatedAtDesc(String itemId);
     
     // Find offers made by a buyer
     List<Offer> findByBuyerIdOrderByCreatedAtDesc(Long buyerId);
@@ -32,30 +32,30 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     List<Offer> findBySellerIdAndStatus(Long sellerId, OfferStatus status);
     
     // Find offers by item and status
-    List<Offer> findByItemIdAndStatus(Long itemId, OfferStatus status);
+    List<Offer> findByItemIdAndStatus(String itemId, OfferStatus status);
     
     // Find pending offers for a specific item
-    List<Offer> findByItemIdAndStatusOrderByCreatedAtDesc(Long itemId, OfferStatus status);
-    
+    List<Offer> findByItemIdAndStatusOrderByCreatedAtDesc(String itemId, OfferStatus status);
+
     // Find expired offers
     @Query("SELECT o FROM Offer o WHERE o.expiresAt < ?1 AND o.status = 'PENDING'")
     List<Offer> findExpiredOffers(LocalDateTime now);
     
     // Find offers between buyer and seller for specific item
-    List<Offer> findByBuyerIdAndSellerIdAndItemIdOrderByCreatedAtDesc(Long buyerId, Long sellerId, Long itemId);
+    List<Offer> findByBuyerIdAndSellerIdAndItemIdOrderByCreatedAtDesc(Long buyerId, Long sellerId, String itemId);
     
     // Check if buyer has pending offer for item
-    Optional<Offer> findByBuyerIdAndItemIdAndStatus(Long buyerId, Long itemId, OfferStatus status);
+    Optional<Offer> findByBuyerIdAndItemIdAndStatus(Long buyerId, String itemId, OfferStatus status);
     
     // Get highest offer for an item
-    @Query("SELECT o FROM Offer o WHERE o.item.id = ?1 AND o.status IN ('PENDING', 'COUNTERED') ORDER BY o.offeredAmount DESC")
-    Page<Offer> findHighestOfferForItem(Long itemId, Pageable pageable);
+    @Query("SELECT o FROM Offer o WHERE o.itemId = ?1 AND o.status IN ('PENDING', 'COUNTERED') ORDER BY o.offeredAmount DESC")
+    Page<Offer> findHighestOfferForItem(String itemId, Pageable pageable);
     
     // Count offers by status
     long countByStatus(OfferStatus status);
     
     // Count offers for item
-    long countByItemId(Long itemId);
+    long countByItemId(String itemId);
     
     // Find recent offers (last 30 days)
     @Query("SELECT o FROM Offer o WHERE o.createdAt >= ?1 ORDER BY o.createdAt DESC")
