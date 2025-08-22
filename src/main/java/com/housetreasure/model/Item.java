@@ -35,6 +35,15 @@ public class Item {
     private LocalDateTime updatedAt;
     private LocalDateTime soldAt;
 
+    private Integer views;
+    private List<String> tags;
+
+// Constructors
+    public Item() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.views = 0;
+    }
 
     // Getters and Setters
     public String getId() {
@@ -140,13 +149,21 @@ public class Item {
         this.soldAt = soldAt;
     }
 
+    public Integer getViews() {
+        return views;
+    }
+
+    public void setViews(Integer views) {
+        this.views = views;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
     
-
-    // public enum ItemCondition {
-    //     NEW, LIKE_NEW, GOOD, FAIR, POOR
-    // }
-
-    // public enum ItemStatus {
-    //     AVAILABLE, RESERVED, SOLD, DELETED
-    // }
 }
