@@ -13,6 +13,7 @@ import com.housetreasure.service.ItemService;
 
 @RestController
 @RequestMapping("/api/items")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
 public class ItemController {
     private final ItemService itemService;
 
