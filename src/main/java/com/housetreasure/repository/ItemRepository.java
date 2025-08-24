@@ -32,11 +32,9 @@ public interface ItemRepository extends MongoRepository<Item, String> {
     List<Item> searchByKeyword(String keyword);
     
     // Search by price range
-    @Query("{'price': {$gte: ?0, $lte: ?1}}")
     List<Item> findByPriceBetween(Double minPrice, Double maxPrice);
     
     // Search by location
-    @Query("{'location': {$regex: ?0, $options: 'i'}}")
     List<Item> findByLocationContaining(String location);
     
     // Search by date range

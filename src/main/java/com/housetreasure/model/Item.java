@@ -1,6 +1,7 @@
 package com.housetreasure.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -16,6 +17,7 @@ public class Item {
     private String categoryId;
     private Double price;
     private String condition;
+    private String location;
     private String brand;
     private String model;
     private Integer yearOfPurchase;
@@ -43,6 +45,10 @@ public class Item {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.views = 0;
+        this.imageUrls = new ArrayList<>();
+        this.tags = new ArrayList<>();
+        this.status = "AVAILABLE";
+        this.isNegotiable = true;
     }
 
     // Getters and Setters
@@ -165,5 +171,12 @@ public class Item {
         this.tags = tags;
     }
 
-    
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
 }

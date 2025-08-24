@@ -2,12 +2,16 @@ package com.housetreasure.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.housetreasure.model.Item;
 import com.housetreasure.service.ItemService;
 
@@ -16,6 +20,7 @@ import com.housetreasure.service.ItemService;
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
 public class ItemController {
     private final ItemService itemService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ItemController(ItemService itemService){
         this.itemService = itemService;
@@ -33,15 +38,142 @@ public class ItemController {
         return item != null ? ResponseEntity.ok(item) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
-    public Item createItem(@RequestBody Item item) {
-        return itemService.createItem(item);
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<Item> createItem(
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("price") Double price,
+            @RequestParam("category") String category,
+            @RequestParam("condition") String condition,
+            @RequestParam("location") String location,
+            @RequestParam(value = "tags", required = false) String tagsJson,
+            @RequestParam(value = "newImages", required = false) MultipartFile[] images) {
+        
+        try {
+            // Create Item object
+            Item item = new Item();
+            item.setTitle(title);
+            item.setDescription(description);
+            item.setPrice(price);
+            item.setCategoryId(category);
+            item.setCondition(condition);
+            item.setLocation(location.trim());
+
+            // Initialize lists to prevent null issues
+            item.setImageUrls(new ArrayList<>());
+            item.setTags(new ArrayList<>());
+            
+            // Parse tags from JSON string
+            if (tagsJson != null && !tagsJson.isEmpty()) {
+                List<String> tags = objectMapper.readValue(tagsJson, new TypeReference<List<String>>() {});
+                item.setTags(tags);
+                 System.out.println("Parsed tags: " + tags);
+            }
+            
+             // Handle image uploads (for now, just log them)
+            if (images != null && images.length > 0) {
+                System.out.println("Processing " + images.length + " images:");
+                for (int i = 0; i < images.length; i++) {
+                    MultipartFile image = images[i];
+                    System.out.println("  Image " + i + ": " + 
+                        image.getOriginalFilename() + 
+                        " (" + image.getSize() + " bytes, " + 
+                        image.getContentType() + ")");
+                }
+                // TODO: Implement file upload service to save images and get URLs
+                // For now, just set empty list
+            }
+            
+            System.out.println("Saving item to database...");
+            Item savedItem = itemService.createItem(item);
+            System.out.println("Item created successfully with ID: " + savedItem.getId());
+
+            return ResponseEntity.ok(savedItem);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Item> updateItem(@PathVariable String id, @RequestBody Item item) {
-        Item updated = itemService.updateItem(id, item);
-        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<Item> updateItem(
+            @PathVariable String id,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("price") Double price,
+            @RequestParam("category") String category,
+            @RequestParam("condition") String condition,
+            @RequestParam("location") String location,
+            @RequestParam(value = "tags", required = false) String tagsJson,
+            @RequestParam(value = "newImages", required = false) MultipartFile[] images,
+            @RequestParam(value = "deletedImages", required = false) String deletedImagesJson) {
+        
+        try {
+            // Create Item object
+            Item item = new Item();
+            item.setTitle(title);
+            item.setDescription(description);
+            item.setPrice(price);
+            item.setCategoryId(category);
+            item.setCondition(condition);
+            item.setLocation(location.trim());
+            
+            // Parse tags from JSON string
+            if (tagsJson != null && !tagsJson.trim().isEmpty()) {
+                try {
+                    List<String> tags = objectMapper.readValue(tagsJson, new TypeReference<List<String>>() {});
+                    item.setTags(tags);
+                    System.out.println("Parsed tags: " + tags);
+                } catch (Exception e) {
+                    System.err.println("Failed to parse tags JSON: " + e.getMessage());
+                }
+            }
+            
+            // Handle deleted images
+            if (deletedImagesJson != null && !deletedImagesJson.isEmpty()) {
+                List<String> deletedImages = objectMapper.readValue(deletedImagesJson, new TypeReference<List<String>>() {});
+                System.out.println("Deleted images: " + deletedImages);
+                // TODO: Implement deletion of images
+            }
+            
+            // Handle new image uploads
+            if (images != null && images.length > 0) {
+                System.out.println("Received " + images.length + " new images");
+                // TODO: Implement file upload service
+            }
+            
+            Item updated = itemService.updateItem(id, item);
+            return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // JSON-only create endpoint (for backward compatibility)
+    @PostMapping(value = "/json", consumes = {"application/json"})
+    public ResponseEntity<Item> createItemJson(@RequestBody Item item) {
+        try {
+            Item savedItem = itemService.createItem(item);
+            return ResponseEntity.ok(savedItem);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // JSON-only update endpoint (for backward compatibility)
+    @PutMapping(value = "/{id}/json", consumes = {"application/json"})
+    public ResponseEntity<Item> updateItemJson(@PathVariable String id, @RequestBody Item item) {
+        try {
+            Item updated = itemService.updateItem(id, item);
+            return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")
