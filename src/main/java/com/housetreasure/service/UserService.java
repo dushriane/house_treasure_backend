@@ -47,47 +47,44 @@ public class UserService {
     }
 
     public Optional<User> loginUser(String email, String password) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            User u = user.get();
-            u.setLastLoginAt(LocalDateTime.now());
-            userRepository.save(u);
-            return Optional.of(u);
+        // Fix: Handle the case where findByEmail returns User, not Optional<User>
+        User user = userRepository.findByEmail(email);
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            user.setLastLoginAt(LocalDateTime.now());
+            userRepository.save(user);
+            return Optional.of(user);
         }
         return Optional.empty();
     }
 
     public boolean verifyEmail(String token) {
-        Optional<User> user = userRepository.findByVerificationToken(token);
-        if (user.isPresent()) {
-            User u = user.get();
-            u.setIsActive(true);
-            u.setVerificationToken(null);
-            userRepository.save(u);
+        User user = userRepository.findByVerificationToken(token);
+        if (user != null) {
+            user.setIsActive(true);
+            user.setVerificationToken(null);
+            userRepository.save(user);
             return true;
         }
         return false;
     }
 
     public String generatePasswordResetToken(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
             String token = UUID.randomUUID().toString();
-            User u = user.get();
-            u.setVerificationToken(token); // Reuse field for reset token
-            userRepository.save(u);
+            user.setVerificationToken(token); // Reuse field for reset token
+            userRepository.save(user);
             return token;
         }
         return null;
     }
 
     public boolean resetPassword(String token, String newPassword) {
-        Optional<User> user = userRepository.findByVerificationToken(token);
-        if (user.isPresent()) {
-            User u = user.get();
-            u.setPassword(passwordEncoder.encode(newPassword));
-            u.setVerificationToken(null);
-            userRepository.save(u);
+        User user = userRepository.findByVerificationToken(token);
+        if (user != null) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            user.setVerificationToken(null);
+            userRepository.save(user);
             return true;
         }
         return false;

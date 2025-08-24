@@ -41,12 +41,12 @@ public class AuthController {
             
             // Validate required fields
             if (email == null || password == null) {
-                return ResponseEntity.badRequest().body("Email and password are required");
+                return ResponseEntity.badRequest().body(Map.of("message","Email and password are required"));
             }
             
             // Check if email exists
             if (userRepository.findByEmail(email) != null) {
-                return ResponseEntity.badRequest().body("Email already in use");
+                return ResponseEntity.badRequest().body(Map.of("message","Email already in use"));
             }
             
             // Create new user
@@ -56,21 +56,38 @@ public class AuthController {
             user.setPassword(passwordEncoder.encode(password));
             user.setFirstName(firstName);
             user.setLastName(lastName);
+
+            user.setPhoneNumber((String) request.get("phoneNumber"));
+            user.setProvince((String) request.get("province"));
+            user.setDistrict((String) request.get("district"));
+            user.setSector((String) request.get("sector"));
+            user.setCell((String) request.get("cell"));
+            user.setVillage((String) request.get("village"));
+            user.setMtnMobileMoneyNumber((String) request.get("mtnMobileMoneyNumber"));
+            user.setAirtelMoneyNumber((String) request.get("airtelMoneyNumber"));
+            user.setPreferredPaymentMethod((String) request.get("preferredPaymentMethod"));
+
+            User savedUser = userService.saveUser(user);
             
-            userService.saveUser(user);
-            
+            // Generate a simple token (replace with proper JWT)
+            String token = "temp_token_" + savedUser.getId() + "_" + System.currentTimeMillis();
+
             return ResponseEntity.ok(Map.of(
                 "message", "User registered successfully",
                 "user", Map.of(
-                    "id", user.getId(),
-                    "username", user.getUsername(),
-                    "email", user.getEmail()
-                )
+                    "id", savedUser.getId(),
+                    "username", savedUser.getUsername(),
+                    "email", savedUser.getEmail(),
+                    "firstName", savedUser.getFirstName(),
+                    "lastName", savedUser.getLastName()
+                ),
+                "token", token
             ));
             
         } catch (Exception e) {
             System.err.println("Registration error: " + e.getMessage());
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("message", "Registration failed: " + e.getMessage()));
         }
     }
     
@@ -86,28 +103,41 @@ public class AuthController {
         // For now, return a placeholder (implement actual user retrieval later)
         return ResponseEntity.ok(Map.of("message", "Current user endpoint"));
     }
-    // public ResponseEntity<?> register(@RequestBody User user) {
-    //     if (userRepository.findByEmail(user.getEmail()) != null) {
-    //         return ResponseEntity.badRequest().body("Email already in use");
-    //     }
-    //     if (userRepository.findAll().stream().anyMatch(u -> u.getUsername().equals(user.getUsername()))) {
-    //         return ResponseEntity.badRequest().body("Username already in use");
-    //     }
-    //     user.setPassword(passwordEncoder.encode(user.getPassword()));
-    //     userService.saveUser(user);
-    //     return ResponseEntity.ok("User registered successfully");
-    // }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody Map<String, String> credentials) {
-    String email = credentials.get("email");
-    String password = credentials.get("password");
-    
-    Optional<User> userOptional = userService.loginUser(email, password);
-    
-    return userOptional.map(ResponseEntity::ok)
-                      .orElse(ResponseEntity.status(401).build());
-}
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> credentials) {
+    try {
+            String email = credentials.get("email");
+            String password = credentials.get("password");
+            
+            System.out.println("Login attempt for email: " + email);
+            
+            Optional<User> userOptional = userService.loginUser(email, password);
+            
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                String token = "temp_token_" + user.getId() + "_" + System.currentTimeMillis();
+                
+                return ResponseEntity.ok(Map.of(
+                    "message", "Login successful",
+                    "user", Map.of(
+                        "id", user.getId(),
+                        "username", user.getUsername(),
+                        "email", user.getEmail(),
+                        "firstName", user.getFirstName(),
+                        "lastName", user.getLastName()
+                    ),
+                    "token", token
+                ));
+            } else {
+                return ResponseEntity.status(401).body(Map.of("message", "Invalid email or password"));
+            }
+        } catch (Exception e) {
+            System.err.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("message", "Login failed: " + e.getMessage()));
+        }
+    }
 
     public static class LoginRequest {
         private String email;
