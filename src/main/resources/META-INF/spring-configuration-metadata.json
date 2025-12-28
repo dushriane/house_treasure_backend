@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "file.upload-dir",
+      "type": "java.lang.String",
+      "description": "Directory path for storing uploaded item images",
+      "defaultValue": "uploads/items"
+    },
+    {
+      "name": "file.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL for constructing image URLs",
+      "defaultValue": "http://localhost:8080"
+    }
+  ]
+}
