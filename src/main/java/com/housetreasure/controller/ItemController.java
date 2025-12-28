@@ -14,16 +14,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.housetreasure.model.Item;
 import com.housetreasure.service.ItemService;
+import com.housetreasure.service.FileUploadService;
 
 @RestController
 @RequestMapping("/api/items")
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
 public class ItemController {
     private final ItemService itemService;
+    private final FileUploadService fileUploadService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ItemController(ItemService itemService){
+    public ItemController(ItemService itemService, FileUploadService fileUploadService){
         this.itemService = itemService;
+        this.fileUploadService = fileUploadService;
     }
 
     // === BASIC CRUD ===
@@ -138,8 +141,10 @@ public class ItemController {
                         " (" + image.getSize() + " bytes, " + 
                         image.getContentType() + ")");
                 }
-                // TODO: Implement file upload service to save images and get URLs
-                // For now, just set empty list
+                // Upload images and get URLs
+                List<String> imageUrls = fileUploadService.uploadImages(images);
+                item.setImageUrls(imageUrls);
+                System.out.println("Uploaded " + imageUrls.size() + " images successfully");
             }
             
             System.out.println("Saving item to database...");
@@ -192,13 +197,26 @@ public class ItemController {
             if (deletedImagesJson != null && !deletedImagesJson.isEmpty()) {
                 List<String> deletedImages = objectMapper.readValue(deletedImagesJson, new TypeReference<List<String>>() {});
                 System.out.println("Deleted images: " + deletedImages);
-                // TODO: Implement deletion of images
+                // Delete images from filesystem
+                for (String imageUrl : deletedImages) {
+                    fileUploadService.deleteImage(imageUrl);
+                }
+                // Remove deleted images from item's imageUrls list
+                if (item.getImageUrls() != null) {
+                    item.getImageUrls().removeAll(deletedImages);
+                }
             }
             
             // Handle new image uploads
             if (images != null && images.length > 0) {
                 System.out.println("Received " + images.length + " new images");
-                // TODO: Implement file upload service
+                // Upload new images and add URLs to existing list
+                List<String> newImageUrls = fileUploadService.uploadImages(images);
+                if (item.getImageUrls() == null) {
+                    item.setImageUrls(new ArrayList<>());
+                }
+                item.getImageUrls().addAll(newImageUrls);
+                System.out.println("Uploaded " + newImageUrls.size() + " new images successfully");
             }
             
             Item updated = itemService.updateItem(id, item);
