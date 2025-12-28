@@ -135,6 +135,18 @@ public class OfferController {
         return offerService.getOffersReceivedByUser(sellerId);
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Map<String, Object>> getAllOffersForUser(@PathVariable Long userId) {
+        List<Offer> buyerOffers = offerService.getOffersMadeByUser(userId);
+        List<Offer> sellerOffers = offerService.getOffersReceivedByUser(userId);
+        
+        return ResponseEntity.ok(Map.of(
+            "buyerOffers", buyerOffers,
+            "sellerOffers", sellerOffers,
+            "totalOffers", buyerOffers.size() + sellerOffers.size()
+        ));
+    }
+
     @GetMapping("/status/{status}")
     public List<Offer> getOffersByStatus(@PathVariable OfferStatus status) {
         return offerService.getOffersByStatus(status);

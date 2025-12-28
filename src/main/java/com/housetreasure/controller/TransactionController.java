@@ -214,6 +214,11 @@ public class TransactionController {
         return transactionService.getUserTransactionHistory(userId);
     }
 
+    @GetMapping("/users/{userId}")
+    public List<Transaction> getUserTransactions(@PathVariable Long userId) {
+        return transactionService.getUserTransactionHistory(userId);
+    }
+
     @GetMapping("/status/{status}")
     public List<Transaction> getTransactionsByStatus(@PathVariable TransactionStatus status) {
         return transactionService.getTransactionsByStatus(status);
