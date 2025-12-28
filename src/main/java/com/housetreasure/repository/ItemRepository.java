@@ -47,6 +47,9 @@ public interface ItemRepository extends MongoRepository<Item, String> {
     // Get available items only
     List<Item> findByStatusAndCategoryId(String status, String categoryId);
     
+    // Paginated query for category
+    Page<Item> findByCategoryIdAndStatus(String categoryId, String status, Pageable pageable);
+    
     // Sort by price (ascending)
     List<Item> findByStatusOrderByPriceAsc(String status);
     

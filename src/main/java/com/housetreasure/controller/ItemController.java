@@ -32,6 +32,64 @@ public class ItemController {
         return itemService.getAllItems();
     }
 
+    // === PAGINATED ENDPOINTS FOR INFINITE SCROLL ===
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String, Object>> getItemsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String condition,
+            @RequestParam(required = false) String sortBy) {
+        
+        try {
+            Page<Item> itemsPage;
+            Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+            
+            if (category != null && !category.isEmpty()) {
+                itemsPage = itemService.getItemsByCategoryPaginated(category, pageable);
+            } else {
+                itemsPage = itemService.getAllItemsPaginated(pageable);
+            }
+            
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("items", itemsPage.getContent());
+            response.put("currentPage", itemsPage.getNumber());
+            response.put("totalItems", itemsPage.getTotalElements());
+            response.put("totalPages", itemsPage.getTotalPages());
+            response.put("hasNext", itemsPage.hasNext());
+            response.put("hasPrevious", itemsPage.hasPrevious());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<Map<String, Object>> getItemsFeed(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        
+        try {
+            Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page, size, 
+                org.springframework.data.domain.Sort.by("createdAt").descending()
+            );
+            Page<Item> itemsPage = itemService.getAllItemsPaginated(pageable);
+            
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("items", itemsPage.getContent());
+            response.put("currentPage", itemsPage.getNumber());
+            response.put("totalItems", itemsPage.getTotalElements());
+            response.put("totalPages", itemsPage.getTotalPages());
+            response.put("hasNext", itemsPage.hasNext());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Item> getItemById(@PathVariable String id) {
         Item item = itemService.getItemWithIncrementedViews(id);

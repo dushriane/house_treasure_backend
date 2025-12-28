@@ -136,15 +136,15 @@ public class OfferController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Map<String, Object>> getAllOffersForUser(@PathVariable Long userId) {
+    public List<Offer> getAllOffersForUser(@PathVariable Long userId) {
         List<Offer> buyerOffers = offerService.getOffersMadeByUser(userId);
         List<Offer> sellerOffers = offerService.getOffersReceivedByUser(userId);
         
-        return ResponseEntity.ok(Map.of(
-            "buyerOffers", buyerOffers,
-            "sellerOffers", sellerOffers,
-            "totalOffers", buyerOffers.size() + sellerOffers.size()
-        ));
+        // Combine both lists and return as array
+        List<Offer> allOffers = new java.util.ArrayList<>();
+        allOffers.addAll(buyerOffers);
+        allOffers.addAll(sellerOffers);
+        return allOffers;
     }
 
     @GetMapping("/status/{status}")

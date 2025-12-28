@@ -27,6 +27,14 @@ public class ItemService {
         return itemRepository.findAll();
     }
 
+    public Page<Item> getAllItemsPaginated(Pageable pageable) {
+        return itemRepository.findAll(pageable);
+    }
+
+    public Page<Item> getItemsByCategoryPaginated(String categoryId, Pageable pageable) {
+        return itemRepository.findByCategoryIdAndStatus(categoryId, "AVAILABLE", pageable);
+    }
+
     public Item createItem(Item item) {
         item.setCreatedAt(LocalDateTime.now());
         item.setUpdatedAt(LocalDateTime.now());
